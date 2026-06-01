@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --use-npm --import-alias \"@/*\")",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --use-npm --import-alias \"@/*\" -- --name gift-whisperer)",
+      "Read(//c/Users/padma/OneDrive/Desktop/Projects/**)",
+      "Bash(npx create-next-app@latest gift-whisperer-temp --typescript --tailwind --eslint --app --src-dir --use-npm --import-alias \"@/*\")",
+      "Bash(xcopy \"c:\\\\Users\\\\padma\\\\OneDrive\\\\Desktop\\\\Projects\\\\gift-whisperer-temp\\\\*\" \"c:\\\\Users\\\\padma\\\\OneDrive\\\\Desktop\\\\Projects\\\\Gift Whisperer\\\\\" /E /H /Y /Q 2>&1)"
+    ]
+  }
+}
