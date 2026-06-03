@@ -18,6 +18,6 @@ ALTER TABLE public.recipients ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can manage own recipients"
   ON public.recipients FOR ALL
-  TO authenticated
+  TO authenticated   
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
