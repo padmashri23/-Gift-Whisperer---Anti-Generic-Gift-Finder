@@ -121,14 +121,17 @@ export default function RecipientsPage() {
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-border">
-                  <Link
-                    href={`/find?recipientId=${recipient.id}`}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.location.href = `/find?recipientId=${recipient.id}`;
+                    }}
                     className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     <Gift className="h-3 w-3" />
                     Find gift
-                  </Link>
+                  </button>
                 </div>
               </Card>
             </Link>

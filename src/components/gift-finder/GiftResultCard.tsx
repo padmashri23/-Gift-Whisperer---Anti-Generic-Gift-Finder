@@ -9,7 +9,7 @@ import {
   Bookmark,
   BookmarkCheck,
   CheckCircle2,
-  ExternalLink,
+  ShoppingCart,
   Star,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -80,12 +80,14 @@ export default function GiftResultCard({
     }
   }
 
-  function searchOnline() {
+  function openStore(store: "amazon" | "flipkart" | "meesho") {
     const query = encodeURIComponent(purchaseKeywords.join(" "));
-    window.open(
-      `https://www.google.com/search?tbm=shop&q=${query}`,
-      "_blank"
-    );
+    const urls = {
+      amazon: `https://www.amazon.in/s?k=${query}`,
+      flipkart: `https://www.flipkart.com/search?q=${query}`,
+      meesho: `https://www.meesho.com/search?q=${query}`,
+    };
+    window.open(urls[store], "_blank");
   }
 
   return (
@@ -112,7 +114,7 @@ export default function GiftResultCard({
         </p>
       </div>
 
-      <div className="mt-auto flex items-center gap-2 pt-2">
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
         <Button
           variant="ghost"
           size="sm"
@@ -140,15 +142,35 @@ export default function GiftResultCard({
           </span>
         )}
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={searchOnline}
-          className="ml-auto"
-        >
-          <ExternalLink className="h-4 w-4" />
-          Buy
-        </Button>
+        <div className="ml-auto flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => openStore("amazon")}
+            title="Search on Amazon"
+          >
+            <ShoppingCart className="h-3.5 w-3.5" />
+            Amazon
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => openStore("flipkart")}
+            title="Search on Flipkart"
+          >
+            <ShoppingCart className="h-3.5 w-3.5" />
+            Flipkart
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => openStore("meesho")}
+            title="Search on Meesho"
+          >
+            <ShoppingCart className="h-3.5 w-3.5" />
+            Meesho
+          </Button>
+        </div>
       </div>
     </Card>
   );

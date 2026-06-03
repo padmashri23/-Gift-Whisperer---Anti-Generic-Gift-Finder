@@ -27,8 +27,8 @@ interface GiftIdea {
 export default function FindPage() {
   const [description, setDescription] = useState("");
   const [occasion, setOccasion] = useState("");
-  const [budgetMin, setBudgetMin] = useState(25);
-  const [budgetMax, setBudgetMax] = useState(100);
+  const [budgetMin, setBudgetMin] = useState(500);
+  const [budgetMax, setBudgetMax] = useState(5000);
   const [showOptions, setShowOptions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GiftIdea[]>([]);

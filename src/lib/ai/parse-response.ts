@@ -20,10 +20,28 @@ export function parseGiftResponse(raw: string): ParsedGiftIdea[] {
     .replace(/\n?```\s*$/m, "")
     .trim();
 
-  const parsed = JSON.parse(cleaned);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch {
+    const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
+    if (arrayMatch) {
+      parsed = JSON.parse(arrayMatch[0]);
+    } else {
+      throw new Error("AI returned invalid JSON. Please try again.");
+    }
+  }
+
   const data = Array.isArray(parsed)
     ? parsed
-    : parsed.ideas ?? parsed.gifts ?? parsed.results ?? [];
+    : (parsed as Record<string, unknown>).ideas ??
+      (parsed as Record<string, unknown>).gifts ??
+      (parsed as Record<string, unknown>).results ??
+      [];
 
-  return GiftIdeasArraySchema.parse(data);
+  const validated = GiftIdeasArraySchema.safeParse(data);
+  if (!validated.success) {
+    throw new Error("AI returned unexpected format. Please try again.");
+  }
+  return validated.data;
 }

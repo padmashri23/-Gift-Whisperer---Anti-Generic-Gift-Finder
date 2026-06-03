@@ -17,15 +17,15 @@ ${req.relationship ? `Relationship to gift-giver: ${req.relationship}` : ""}
 Description: ${req.description}
 ${req.interests && req.interests.length > 0 ? `Known interests: ${req.interests.join(", ")}` : ""}
 ${req.occasion ? `Occasion: ${req.occasion}` : "Occasion: Not specified"}
-Budget: $${req.budgetMin ?? 0} - $${req.budgetMax ?? 200}
+Budget: ₹${req.budgetMin ?? 0} - ₹${req.budgetMax ?? 5000} INR
 ${exclusionBlock}
 
 ## Instructions
 Generate exactly 5 unique, creative gift ideas. For each gift:
 1. Be SPECIFIC (not "a book" but "The Ceramics Bible by Louisa Taylor")
 2. Explain WHY this gift is perfect for THIS person based on their description
-3. Provide realistic price estimates in USD
-4. Suggest search keywords someone could use to find and buy this gift
+3. Provide realistic price estimates in INR (Indian Rupees)
+4. Suggest search keywords someone could use to find and buy this gift on Indian e-commerce sites (Amazon India, Flipkart, Meesho)
 5. Categorize each gift (experience, handmade, tech, book, subscription, food-drink, home, fashion, hobby-gear, novelty)
 
 Respond ONLY with a JSON array. No markdown, no code fences, no explanation outside the JSON.

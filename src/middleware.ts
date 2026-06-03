@@ -1,7 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const PROTECTED_ROUTES = ["/dashboard", "/find", "/recipients", "/history", "/settings"];
+const AUTH_ROUTES = ["/login", "/signup"];
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
+  const isAuth = AUTH_ROUTES.some((r) => pathname.startsWith(r));
+
+  if (!isProtected && !isAuth) return NextResponse.next();
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -25,28 +35,15 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const isProtectedRoute =
-    request.nextUrl.pathname.startsWith("/dashboard") ||
-    request.nextUrl.pathname.startsWith("/find") ||
-    request.nextUrl.pathname.startsWith("/recipients") ||
-    request.nextUrl.pathname.startsWith("/history") ||
-    request.nextUrl.pathname.startsWith("/settings");
-
-  if (!user && isProtectedRoute) {
+  if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  const isAuthRoute =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup");
-
-  if (user && isAuthRoute) {
+  if (user && isAuth) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -57,6 +54,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/dashboard/:path*",
+    "/find/:path*",
+    "/recipients/:path*",
+    "/history/:path*",
+    "/settings/:path*",
+    "/login",
+    "/signup",
   ],
 };
