@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,8 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col font-sans">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

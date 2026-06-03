@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   ShoppingCart,
   Star,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -25,6 +26,7 @@ interface GiftResultCardProps {
   purchaseKeywords: string[];
   isSaved?: boolean;
   isGiven?: boolean;
+  regiftWarning?: boolean;
 }
 
 export default function GiftResultCard({
@@ -38,6 +40,7 @@ export default function GiftResultCard({
   purchaseKeywords,
   isSaved: initialSaved = false,
   isGiven: initialGiven = false,
+  regiftWarning = false,
 }: GiftResultCardProps) {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isGiven, setIsGiven] = useState(initialGiven);
@@ -91,7 +94,14 @@ export default function GiftResultCard({
   }
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className={`flex flex-col h-full ${regiftWarning ? "ring-2 ring-warning/50" : ""}`}>
+      {regiftWarning && (
+        <div className="flex items-center gap-2 bg-warning/10 text-warning rounded-lg px-3 py-2 mb-3 text-xs font-medium">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          You&apos;ve given a similar gift before
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-2 mb-3">
         <div>
           <h3 className="font-semibold text-text-primary leading-tight">

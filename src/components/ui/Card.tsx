@@ -14,7 +14,7 @@ export default function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border bg-white shadow-sm",
+        "rounded-xl border border-border bg-[var(--card-bg)] shadow-sm",
         {
           "p-0": padding === "none",
           "p-4": padding === "sm",

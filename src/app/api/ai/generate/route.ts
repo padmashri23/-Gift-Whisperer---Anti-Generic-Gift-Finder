@@ -42,6 +42,14 @@ export async function POST(request: Request) {
     }
   }
 
+  const { data: allGivenGifts } = await supabase
+    .from("gift_ideas")
+    .select("title, category")
+    .eq("user_id", user.id)
+    .eq("is_given", true);
+
+  const previouslyGiven = allGivenGifts?.map((g) => g.title.toLowerCase()) ?? [];
+
   try {
     const result = await generateGifts({
       ...parsed.data,
@@ -81,7 +89,17 @@ export async function POST(request: Request) {
         )
         .select();
 
-      return NextResponse.json({ session, ideas: savedIdeas });
+      const ideasWithAlerts = savedIdeas?.map((idea) => {
+        const isDuplicate = previouslyGiven.some(
+          (given) =>
+            given === idea.title.toLowerCase() ||
+            idea.title.toLowerCase().includes(given) ||
+            given.includes(idea.title.toLowerCase())
+        );
+        return { ...idea, regift_warning: isDuplicate };
+      });
+
+      return NextResponse.json({ session, ideas: ideasWithAlerts });
     }
 
     return NextResponse.json({

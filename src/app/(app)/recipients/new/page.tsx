@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
+import AvatarUpload from "@/components/ui/AvatarUpload";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ export default function NewRecipientPage() {
   const [interests, setInterests] = useState<string[]>([]);
   const [interestInput, setInterestInput] = useState("");
   const [notes, setNotes] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   function addInterest() {
     const trimmed = interestInput.trim();
@@ -62,6 +64,7 @@ export default function NewRecipientPage() {
           description: description || undefined,
           interests,
           notes: notes || undefined,
+          avatar_url: avatarUrl || undefined,
         }),
       });
 
@@ -102,6 +105,12 @@ export default function NewRecipientPage() {
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-5">
+          <AvatarUpload
+            currentUrl={avatarUrl}
+            onUpload={setAvatarUrl}
+            folder="recipients"
+          />
+
           <Input
             id="name"
             label="Name"
@@ -118,7 +127,7 @@ export default function NewRecipientPage() {
             <select
               value={relationship}
               onChange={(e) => setRelationship(e.target.value)}
-              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-text-primary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="w-full rounded-lg border border-border bg-[var(--input-bg)] px-3 py-2 text-sm text-text-primary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               <option value="">Select...</option>
               {relationships.map((r) => (
@@ -154,7 +163,7 @@ export default function NewRecipientPage() {
                     addInterest();
                   }
                 }}
-                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="flex-1 rounded-lg border border-border bg-[var(--input-bg)] px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
               />
               <Button
                 type="button"

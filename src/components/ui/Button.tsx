@@ -28,11 +28,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
+          "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-[var(--surface)] disabled:opacity-50 disabled:cursor-not-allowed",
           {
             "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800":
               variant === "primary",
-            "bg-white text-text-primary border border-border hover:bg-surface-secondary active:bg-surface-tertiary":
+            "bg-[var(--card-bg)] text-text-primary border border-border hover:bg-surface-secondary active:bg-surface-tertiary":
               variant === "secondary",
             "text-text-secondary hover:bg-surface-secondary active:bg-surface-tertiary":
               variant === "ghost",

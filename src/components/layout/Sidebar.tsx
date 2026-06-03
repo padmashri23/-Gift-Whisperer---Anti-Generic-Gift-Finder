@@ -10,12 +10,16 @@ import {
   Clock,
   Settings,
   LayoutDashboard,
+  CalendarDays,
+  TrendingUp,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/find", label: "Find Gift", icon: Search },
   { href: "/recipients", label: "Recipients", icon: Users },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/trending", label: "Trending", icon: TrendingUp },
   { href: "/history", label: "Gift History", icon: Clock },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -24,7 +28,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-white min-h-screen">
+    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-[var(--card-bg)] min-h-screen">
       <div className="p-6">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">

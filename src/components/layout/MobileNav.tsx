@@ -10,6 +10,8 @@ import {
   Clock,
   Settings,
   LayoutDashboard,
+  CalendarDays,
+  TrendingUp,
   X,
 } from "lucide-react";
 
@@ -17,6 +19,8 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/find", label: "Find Gift", icon: Search },
   { href: "/recipients", label: "Recipients", icon: Users },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/trending", label: "Trending", icon: TrendingUp },
   { href: "/history", label: "Gift History", icon: Clock },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -34,7 +38,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className="fixed inset-y-0 left-0 w-72 bg-white shadow-xl">
+      <div className="fixed inset-y-0 left-0 w-72 bg-[var(--card-bg)] shadow-xl">
         <div className="flex items-center justify-between p-6">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">

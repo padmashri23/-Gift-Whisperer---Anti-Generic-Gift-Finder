@@ -15,4 +15,5 @@ export const RecipientSchema = z.object({
     .max(10)
     .optional(),
   notes: z.string().max(2000).optional(),
+  avatar_url: z.string().url().optional(),
 });

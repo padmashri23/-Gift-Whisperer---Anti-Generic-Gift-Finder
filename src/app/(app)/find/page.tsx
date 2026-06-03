@@ -8,7 +8,8 @@ import OccasionSelector from "@/components/gift-finder/OccasionSelector";
 import BudgetFilter from "@/components/gift-finder/BudgetFilter";
 import GiftResultCard from "@/components/gift-finder/GiftResultCard";
 import GeneratingAnimation from "@/components/gift-finder/GeneratingAnimation";
-import { Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import PersonalityQuiz from "@/components/gift-finder/PersonalityQuiz";
+import { Sparkles, ChevronDown, ChevronUp, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 
 interface GiftIdea {
@@ -22,6 +23,7 @@ interface GiftIdea {
   purchase_keywords: string[];
   is_saved: boolean;
   is_given: boolean;
+  regift_warning?: boolean;
 }
 
 export default function FindPage() {
@@ -33,9 +35,10 @@ export default function FindPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GiftIdea[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
-  async function handleGenerate(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleGenerate(e?: React.FormEvent) {
+    if (e) e.preventDefault();
 
     if (description.trim().length < 10) {
       toast.error("Please describe the recipient in at least 10 characters");
@@ -75,6 +78,31 @@ export default function FindPage() {
     }
   }
 
+  function handleQuizComplete(result: { description: string; interests: string[] }) {
+    setDescription(result.description);
+    setShowQuiz(false);
+    toast.success("Quiz complete! Description filled in. Review and hit Generate.");
+  }
+
+  if (showQuiz) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">
+            Gift Personality Quiz
+          </h1>
+          <p className="text-text-secondary mt-1">
+            Answer a few questions and we&apos;ll build a profile for you
+          </p>
+        </div>
+        <PersonalityQuiz
+          onComplete={handleQuizComplete}
+          onCancel={() => setShowQuiz(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -89,9 +117,23 @@ export default function FindPage() {
 
       <Card>
         <form onSubmit={handleGenerate} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <label htmlFor="description" className="block text-sm font-medium text-text-primary">
+              Who are you shopping for?
+            </label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowQuiz(true)}
+            >
+              <ClipboardList className="h-4 w-4" />
+              Take Quiz Instead
+            </Button>
+          </div>
+
           <Textarea
             id="description"
-            label="Who are you shopping for?"
             placeholder='Tell me about the person... What do they love? What are they like? Any inside jokes? Example: "My friend who just got into pottery but is intimidated by the studio, loves weird podcasts, and has a cat named Chairman Meow."'
             rows={5}
             value={description}
@@ -152,7 +194,7 @@ export default function FindPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={handleGenerate}
+              onClick={() => handleGenerate()}
               disabled={loading}
             >
               <Sparkles className="h-4 w-4" />
@@ -174,6 +216,7 @@ export default function FindPage() {
                 purchaseKeywords={idea.purchase_keywords}
                 isSaved={idea.is_saved}
                 isGiven={idea.is_given}
+                regiftWarning={idea.regift_warning}
               />
             ))}
           </div>

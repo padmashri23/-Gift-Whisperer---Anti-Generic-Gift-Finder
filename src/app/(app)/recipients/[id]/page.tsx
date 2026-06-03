@@ -13,7 +13,9 @@ import {
   Trash2,
   Calendar,
   Star,
+  User,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -92,6 +94,21 @@ export default function RecipientDetailPage({
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
+        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-border shrink-0">
+          {recipient.avatar_url ? (
+            <Image
+              src={recipient.avatar_url}
+              alt={recipient.name}
+              width={48}
+              height={48}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-surface-tertiary flex items-center justify-center">
+              <User className="h-6 w-6 text-text-tertiary" />
+            </div>
+          )}
+        </div>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary">
             {recipient.name}
