@@ -59,12 +59,11 @@ export default function SignupPage() {
         </div>
         <h1 className="text-2xl font-bold text-text-primary">
           Create your account
-        </h1>
+        </h1>   
         <p className="text-sm text-text-secondary mt-1">
           Start finding perfect gifts
         </p>
       </div>
-
       <form onSubmit={handleSignup} className="space-y-4">
         <Input
           id="fullName"
