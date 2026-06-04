@@ -102,8 +102,8 @@ export default function GiftResultCard({
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <h3 className="font-semibold text-text-primary leading-tight">
             {title}
           </h3>
@@ -116,48 +116,51 @@ export default function GiftResultCard({
 
       <p className="text-sm text-text-secondary mb-3">{description}</p>
 
-      <div className="bg-primary-50 rounded-lg px-3 py-2 mb-4">
-        <p className="text-sm text-primary-800">
+      <div className="mb-4 rounded-lg bg-primary-50 px-3 py-2 dark:bg-primary-900/30">
+        <p className="text-sm text-primary-800 dark:text-primary-100">
           <Star className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />
           <span className="font-medium">Why it&apos;s perfect:</span>{" "}
           {whyItsPerfect}
         </p>
       </div>
 
-      <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleSave}
-          loading={saving}
-          className={isSaved ? "text-primary-600" : ""}
-        >
-          {isSaved ? (
-            <BookmarkCheck className="h-4 w-4" />
-          ) : (
-            <Bookmark className="h-4 w-4" />
-          )}
-          {isSaved ? "Saved" : "Save"}
-        </Button>
-
-        {!isGiven ? (
-          <Button variant="ghost" size="sm" onClick={markAsGiven}>
-            <CheckCircle2 className="h-4 w-4" />
-            Mark Given
+      <div className="mt-auto space-y-3 border-t border-border pt-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleSave}
+            loading={saving}
+            className={isSaved ? "text-primary-600" : ""}
+          >
+            {isSaved ? (
+              <BookmarkCheck className="h-4 w-4" />
+            ) : (
+              <Bookmark className="h-4 w-4" />
+            )}
+            {isSaved ? "Saved" : "Save"}
           </Button>
-        ) : (
-          <span className="inline-flex items-center gap-1 text-xs text-success font-medium px-2">
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            Given
-          </span>
-        )}
 
-        <div className="ml-auto flex items-center gap-1">
+          {!isGiven ? (
+            <Button variant="ghost" size="sm" onClick={markAsGiven}>
+              <CheckCircle2 className="h-4 w-4" />
+              Mark Given
+            </Button>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-2 text-xs font-medium text-success">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Given
+            </span>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => openStore("amazon")}
             title="Search on Amazon"
+            className="w-full"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
             Amazon
@@ -167,6 +170,7 @@ export default function GiftResultCard({
             size="sm"
             onClick={() => openStore("flipkart")}
             title="Search on Flipkart"
+            className="w-full"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
             Flipkart
@@ -176,6 +180,7 @@ export default function GiftResultCard({
             size="sm"
             onClick={() => openStore("meesho")}
             title="Search on Meesho"
+            className="w-full"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
             Meesho

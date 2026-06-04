@@ -96,7 +96,7 @@ export default function SignupPage() {
         />
 
         {error && (
-          <p className="text-sm text-error bg-red-50 rounded-lg px-3 py-2">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-error dark:bg-red-950/30">
             {error}
           </p>
         )}
@@ -112,7 +112,7 @@ export default function SignupPage() {
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-2 text-text-tertiary">
+          <span className="bg-[var(--card-bg)] px-2 text-text-tertiary">
             or continue with
           </span>
         </div>

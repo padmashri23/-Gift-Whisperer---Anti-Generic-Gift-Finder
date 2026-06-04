@@ -40,7 +40,7 @@ export default function DashboardPage() {
 
       {/* Quick Action */}
       <Card className="bg-gradient-to-r from-primary-500 to-accent-500 border-0 text-white">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-bold">Find a Gift</h2>
             <p className="text-white/80 mt-1">
@@ -51,7 +51,7 @@ export default function DashboardPage() {
             <Button
               variant="secondary"
               size="lg"
-              className="bg-white text-primary-700 hover:bg-white/90 border-0"
+              className="w-full border-0 bg-white text-primary-700 hover:bg-white/90 sm:w-auto"
             >
               <Sparkles className="h-5 w-5" />
               Start

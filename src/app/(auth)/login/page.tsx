@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Card from "@/components/ui/Card";
-import { Gift, Mail, Lock } from "lucide-react";
+import { Gift, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -80,7 +80,7 @@ export default function LoginPage() {
         />
 
         {error && (
-          <p className="text-sm text-error bg-red-50 rounded-lg px-3 py-2">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-error dark:bg-red-950/30">
             {error}
           </p>
         )}
@@ -96,7 +96,7 @@ export default function LoginPage() {
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-2 text-text-tertiary">
+          <span className="bg-[var(--card-bg)] px-2 text-text-tertiary">
             or continue with
           </span>
         </div>

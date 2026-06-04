@@ -35,10 +35,10 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     async function loadEvents() {
+      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -92,7 +92,7 @@ export default function CalendarPage() {
       setLoading(false);
     }
     loadEvents();
-  }, [supabase]);
+  }, []);
 
   const calendarDays = useMemo(() => {
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();

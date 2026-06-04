@@ -9,30 +9,31 @@ export const metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--surface)]">
       {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <header className="border-b border-border bg-[var(--card-bg)]">
+        <div className="mx-auto flex h-16 w-full max-w-[19rem] items-center justify-between px-4 sm:max-w-6xl sm:px-6">
+          <div className="flex min-w-0 items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <Gift className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-text-primary">
+            <span className="truncate text-base font-bold text-text-primary sm:text-lg">
               Gift Whisperer
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+              className="hidden text-sm font-medium text-text-secondary transition-colors hover:text-text-primary sm:inline"
             >
               Sign in
             </Link>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
+              aria-label="Get started"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-sm font-medium text-white transition-colors hover:bg-primary-700 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-4 sm:py-2"
             >
-              Get Started
+              <span className="hidden sm:inline">Get Started</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -41,33 +42,33 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50" />
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-32 text-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-[var(--surface)] to-accent-50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900" />
+        <div className="relative mx-auto w-full max-w-[19rem] px-4 py-20 text-center sm:max-w-6xl sm:px-6 sm:py-32">
           <div className="inline-flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-4 py-1.5 text-sm text-primary-700 font-medium mb-6">
             <Sparkles className="h-4 w-4" />
             AI-Powered Gift Recommendations
           </div>
-          <h1 className="text-4xl sm:text-6xl font-bold text-text-primary tracking-tight max-w-4xl mx-auto leading-tight">
+          <h1 className="mx-auto max-w-sm text-3xl font-bold leading-tight text-text-primary sm:max-w-4xl sm:text-6xl">
             What should you{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-accent-500">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-accent-500 sm:inline">
               get them?
             </span>
           </h1>
-          <p className="mt-6 text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto mt-6 max-w-[19rem] text-lg leading-relaxed text-text-secondary sm:max-w-2xl sm:text-xl">
             Describe someone in your own words and get hyper-specific gift ideas
             that show you truly know them. No more candles and scarves.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mx-auto mt-10 flex w-full max-w-[19rem] flex-col items-center justify-center gap-4 sm:max-w-none sm:flex-row">
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary-600 text-white text-base font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-200 transition-colors hover:bg-primary-700 sm:w-auto sm:px-8"
             >
               <Sparkles className="h-5 w-5" />
               Start Finding Gifts
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary text-base font-medium hover:bg-surface-secondary transition-colors"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3.5 text-base font-medium text-text-secondary transition-colors hover:bg-surface-secondary sm:w-auto sm:px-8"
             >
               See How It Works
             </Link>
@@ -77,11 +78,11 @@ export default function LandingPage() {
 
       {/* Example */}
       <section className="py-16 bg-surface-secondary border-y border-border">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-white rounded-2xl shadow-lg border border-border overflow-hidden">
+        <div className="mx-auto w-full max-w-[19rem] px-4 sm:max-w-4xl sm:px-6">
+          <div className="overflow-hidden rounded-2xl border border-border bg-[var(--card-bg)] shadow-lg">
             <div className="p-6 border-b border-border bg-surface-secondary">
               <p className="text-sm text-text-tertiary mb-2">You type:</p>
-              <p className="text-text-primary italic">
+              <p className="break-words text-text-primary italic">
                 &ldquo;My friend who just got into pottery but is intimidated by
                 the studio, loves weird podcasts, and has a cat named Chairman
                 Meow.&rdquo;
@@ -114,10 +115,10 @@ export default function LandingPage() {
                 ].map((gift) => (
                   <div
                     key={gift.title}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-surface-secondary"
+                    className="flex min-w-0 items-start gap-3 rounded-lg bg-surface-secondary p-3"
                   >
                     <Gift className="h-5 w-5 text-primary-500 mt-0.5 flex-shrink-0" />
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-medium text-text-primary text-sm">
                         {gift.title}
                       </p>
@@ -208,7 +209,7 @@ export default function LandingPage() {
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="bg-white rounded-xl border border-border p-6"
+                className="rounded-xl border border-border bg-[var(--card-bg)] p-6"
               >
                 <feature.icon className="h-6 w-6 text-primary-500 mb-3" />
                 <h3 className="font-semibold text-text-primary mb-1">
@@ -235,7 +236,7 @@ export default function LandingPage() {
           </p>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary-600 text-white text-base font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-200 transition-colors hover:bg-primary-700"
           >
             <Gift className="h-5 w-5" />
             Get Started Free

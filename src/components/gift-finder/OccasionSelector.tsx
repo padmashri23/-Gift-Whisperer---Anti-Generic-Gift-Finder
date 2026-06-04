@@ -42,8 +42,8 @@ export default function OccasionSelector({
             className={cn(
               "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
               value === occasion.label
-                ? "bg-primary-50 border-primary-300 text-primary-700"
-                : "bg-white border-border text-text-secondary hover:bg-surface-secondary"
+                ? "bg-primary-50 border-primary-300 text-primary-700 dark:bg-primary-900/30 dark:text-primary-100"
+                : "bg-[var(--input-bg)] border-border text-text-secondary hover:bg-surface-secondary"
             )}
           >
             <span>{occasion.emoji}</span>

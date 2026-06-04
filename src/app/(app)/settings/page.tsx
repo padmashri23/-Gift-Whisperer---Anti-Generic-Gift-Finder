@@ -17,11 +17,11 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [signOutLoading, setSignOutLoading] = useState(false);
-  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -43,7 +43,7 @@ export default function SettingsPage() {
       setFetching(false);
     }
     load();
-  }, [supabase]);
+  }, []);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -55,6 +55,7 @@ export default function SettingsPage() {
 
     setLoading(true);
 
+    const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -80,6 +81,7 @@ export default function SettingsPage() {
 
   async function handleSignOut() {
     setSignOutLoading(true);
+    const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();

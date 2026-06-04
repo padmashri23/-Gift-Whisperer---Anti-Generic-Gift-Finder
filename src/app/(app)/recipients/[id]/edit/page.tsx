@@ -140,7 +140,7 @@ export default function EditRecipientPage({
             <select
               value={relationship}
               onChange={(e) => setRelationship(e.target.value)}
-              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-text-primary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="w-full rounded-lg border border-border bg-[var(--input-bg)] px-3 py-2 text-sm text-text-primary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               <option value="">Select...</option>
               {relationships.map((r) => (
@@ -175,7 +175,7 @@ export default function EditRecipientPage({
                     addInterest();
                   }
                 }}
-                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="min-w-0 flex-1 rounded-lg border border-border bg-[var(--input-bg)] px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
               />
               <Button
                 type="button"
