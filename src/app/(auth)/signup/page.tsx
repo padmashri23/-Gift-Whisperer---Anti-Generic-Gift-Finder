@@ -64,7 +64,6 @@ export default function SignupPage() {
           Start finding perfect gifts
         </p>
       </div>
-   
       <form onSubmit={handleSignup} className="space-y-4">
         <Input
           id="fullName"
