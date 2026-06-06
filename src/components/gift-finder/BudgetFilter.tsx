@@ -31,7 +31,7 @@ export default function BudgetFilter({
           <input
             type="range"
             min={0}
-            max={25000}
+            max={100000}
             step={500}
             value={min}
             onChange={(e) => {
@@ -46,7 +46,7 @@ export default function BudgetFilter({
           <input
             type="range"
             min={0}
-            max={25000}
+            max={100000}
             step={500}
             value={max}
             onChange={(e) => {

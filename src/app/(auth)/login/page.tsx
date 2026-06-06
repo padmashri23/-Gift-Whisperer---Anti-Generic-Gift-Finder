@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Card from "@/components/ui/Card";
 import { Gift, Mail } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,7 +15,15 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  useEffect(() => {
+    const urlError = searchParams.get("error");
+    if (urlError === "auth_callback_failed") {
+      setError("Authentication failed. Please try again.");
+    }
+  }, [searchParams]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -33,15 +41,17 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
+    const returnTo = searchParams.get("returnTo") || "/dashboard";
+    router.push(returnTo);
     router.refresh();
   }
 
   async function handleGoogleLogin() {
+    const returnTo = searchParams.get("returnTo") || "/dashboard";
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnTo)}`,
       },
     });
     if (error) setError(error.message);

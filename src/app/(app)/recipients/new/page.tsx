@@ -7,7 +7,7 @@ import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import AvatarUpload from "@/components/ui/AvatarUpload";
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, Plus, X, Calendar } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -37,6 +37,9 @@ export default function NewRecipientPage() {
   const [interestInput, setInterestInput] = useState("");
   const [notes, setNotes] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [importantDates, setImportantDates] = useState<{ label: string; date: string }[]>([]);
+  const [dateLabel, setDateLabel] = useState("");
+  const [dateValue, setDateValue] = useState("");
 
   function addInterest() {
     const trimmed = interestInput.trim();
@@ -63,6 +66,7 @@ export default function NewRecipientPage() {
           relationship: relationship || undefined,
           description: description || undefined,
           interests,
+          important_dates: importantDates.length > 0 ? importantDates : undefined,
           notes: notes || undefined,
           avatar_url: avatarUrl || undefined,
         }),
@@ -190,6 +194,62 @@ export default function NewRecipientPage() {
                       <X className="h-3 w-3" />
                     </button>
                   </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-text-primary">
+              Important Dates
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g. Birthday"
+                value={dateLabel}
+                onChange={(e) => setDateLabel(e.target.value)}
+                className="flex-1 rounded-lg border border-border bg-[var(--input-bg)] px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              />
+              <input
+                type="date"
+                value={dateValue}
+                onChange={(e) => setDateValue(e.target.value)}
+                className="rounded-lg border border-border bg-[var(--input-bg)] px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  if (dateLabel.trim() && dateValue) {
+                    setImportantDates([...importantDates, { label: dateLabel.trim(), date: dateValue }]);
+                    setDateLabel("");
+                    setDateValue("");
+                  }
+                }}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            {importantDates.length > 0 && (
+              <div className="space-y-1.5">
+                {importantDates.map((d, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 bg-surface-secondary rounded-lg px-3 py-1.5 text-sm"
+                  >
+                    <Calendar className="h-3.5 w-3.5 text-text-tertiary" />
+                    <span className="font-medium">{d.label}:</span>
+                    <span className="text-text-secondary">{d.date}</span>
+                    <button
+                      type="button"
+                      onClick={() => setImportantDates(importantDates.filter((_, j) => j !== i))}
+                      className="ml-auto text-text-tertiary hover:text-error"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
                 ))}
               </div>
             )}

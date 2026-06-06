@@ -1,12 +1,27 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import type { Database } from "@/types/database";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
-  const supabase = await createClient();
+  const cookieStore = await cookies();
+
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll() {},
+      },
+    }
+  );
 
   const { data: shared } = await supabase
     .from("shared_lists")

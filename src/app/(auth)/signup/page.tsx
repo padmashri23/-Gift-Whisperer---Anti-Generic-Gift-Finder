@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -23,7 +24,7 @@ export default function SignupPage() {
     setError("");
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -34,6 +35,13 @@ export default function SignupPage() {
     if (error) {
       setError(error.message);
       setLoading(false);
+      return;
+    }
+
+    if (data.user && !data.session) {
+      setError("");
+      setLoading(false);
+      setConfirmationSent(true);
       return;
     }
 
@@ -51,6 +59,31 @@ export default function SignupPage() {
     if (error) setError(error.message);
   }
 
+  if (confirmationSent) {
+    return (
+      <Card padding="lg">
+        <div className="text-center py-4">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-100 mb-4">
+            <Mail className="h-6 w-6 text-primary-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-text-primary mb-2">
+            Check your email
+          </h1>
+          <p className="text-sm text-text-secondary mb-4">
+            We sent a confirmation link to <strong>{email}</strong>.
+            Click the link to activate your account.
+          </p>
+          <Link
+            href="/login"
+            className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+          >
+            Back to Sign in
+          </Link>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card padding="lg">
       <div className="text-center mb-8">
@@ -59,7 +92,7 @@ export default function SignupPage() {
         </div>
         <h1 className="text-2xl font-bold text-text-primary">
           Create your account
-        </h1>   
+        </h1>
         <p className="text-sm text-text-secondary mt-1">
           Start finding perfect gifts
         </p>

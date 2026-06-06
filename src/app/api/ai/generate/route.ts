@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       .single();
 
     if (session) {
-      const { data: savedIdeas } = await supabase
+      const { data: savedIdeas, error: insertError } = await supabase
         .from("gift_ideas")
         .insert(
           result.ideas.map((idea) => ({
@@ -89,7 +89,25 @@ export async function POST(request: Request) {
         )
         .select();
 
-      const ideasWithAlerts = savedIdeas?.map((idea) => {
+      if (insertError || !savedIdeas || savedIdeas.length === 0) {
+        console.error("Gift insert failed:", insertError);
+        const fallback = result.ideas.map((idea, i) => ({
+          id: `temp-${Date.now()}-${i}`,
+          title: idea.title,
+          description: idea.description,
+          estimated_price_min: idea.estimatedPriceMin,
+          estimated_price_max: idea.estimatedPriceMax,
+          why_its_perfect: idea.whyItsPerfect,
+          category: idea.category,
+          purchase_keywords: idea.purchaseKeywords,
+          is_saved: false,
+          is_given: false,
+          regift_warning: false,
+        }));
+        return NextResponse.json({ session, ideas: fallback });
+      }
+
+      const ideasWithAlerts = savedIdeas.map((idea) => {
         const isDuplicate = previouslyGiven.some(
           (given) =>
             given === idea.title.toLowerCase() ||
@@ -102,9 +120,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ session, ideas: ideasWithAlerts });
     }
 
+    const fallbackIdeas = result.ideas.map((idea, i) => ({
+      id: `temp-${Date.now()}-${i}`,
+      title: idea.title,
+      description: idea.description,
+      estimated_price_min: idea.estimatedPriceMin,
+      estimated_price_max: idea.estimatedPriceMax,
+      why_its_perfect: idea.whyItsPerfect,
+      category: idea.category,
+      purchase_keywords: idea.purchaseKeywords,
+      is_saved: false,
+      is_given: false,
+      regift_warning: false,
+    }));
+
     return NextResponse.json({
       session: null,
-      ideas: result.ideas,
+      ideas: fallbackIdeas,
     });
   } catch (error) {
     const message =

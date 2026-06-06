@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -19,6 +21,7 @@ import {
   ClipboardList,
   Scale,
   Share2,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,6 +45,9 @@ interface FollowUpQuestion {
 }
 
 export default function FindPage() {
+  const searchParams = useSearchParams();
+  const recipientId = searchParams.get("recipientId");
+
   const [description, setDescription] = useState("");
   const [occasion, setOccasion] = useState("");
   const [budgetMin, setBudgetMin] = useState(500);
@@ -51,19 +57,67 @@ export default function FindPage() {
   const [results, setResults] = useState<GiftIdea[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [initLoading, setInitLoading] = useState(true);
 
-  // Follow-up questions state
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientRelationship, setRecipientRelationship] = useState("");
+  const [recipientInterests, setRecipientInterests] = useState<string[]>([]);
+
   const [followUpQuestions, setFollowUpQuestions] = useState<FollowUpQuestion[]>([]);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [followUpLoading, setFollowUpLoading] = useState(false);
   const [followUpAnswers, setFollowUpAnswers] = useState<string[]>([]);
 
-  // Compare state
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
 
-  // Share state
   const [showShare, setShowShare] = useState(false);
+
+  useEffect(() => {
+    async function init() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setInitLoading(false);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("default_budget_min, default_budget_max")
+        .eq("id", user.id)
+        .single();
+
+      if (profile) {
+        setBudgetMin(profile.default_budget_min);
+        setBudgetMax(profile.default_budget_max);
+      }
+
+      if (recipientId) {
+        const { data: recipient } = await supabase
+          .from("recipients")
+          .select("name, relationship, description, interests")
+          .eq("id", recipientId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (recipient) {
+          setRecipientName(recipient.name);
+          setRecipientRelationship(recipient.relationship || "");
+          setRecipientInterests(recipient.interests || []);
+          if (recipient.description) {
+            setDescription(recipient.description);
+          }
+          setShowOptions(true);
+        }
+      }
+
+      setInitLoading(false);
+    }
+    init();
+  }, [recipientId]);
 
   async function fetchFollowUpQuestions() {
     if (description.trim().length < 10) {
@@ -130,15 +184,30 @@ export default function FindPage() {
     setCompareIds(new Set());
 
     try {
+      const payload: Record<string, unknown> = {
+        description: desc,
+        occasion: occasion || undefined,
+        budgetMin,
+        budgetMax,
+      };
+
+      if (recipientId) {
+        payload.recipientId = recipientId;
+      }
+      if (recipientName) {
+        payload.recipientName = recipientName;
+      }
+      if (recipientRelationship) {
+        payload.relationship = recipientRelationship;
+      }
+      if (recipientInterests.length > 0) {
+        payload.interests = recipientInterests;
+      }
+
       const res = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: desc,
-          occasion: occasion || undefined,
-          budgetMin,
-          budgetMax,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -211,6 +280,20 @@ export default function FindPage() {
 
   const shareGifts = results.map((r) => ({ id: r.id, title: r.title }));
 
+  if (initLoading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">
+            Find the Perfect Gift
+          </h1>
+          <p className="text-text-secondary mt-1">Loading...</p>
+        </div>
+        <Card className="animate-pulse h-64" />
+      </div>
+    );
+  }
+
   if (showQuiz) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
@@ -241,6 +324,16 @@ export default function FindPage() {
           love
         </p>
       </div>
+
+      {recipientName && (
+        <div className="flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2.5 border border-primary-200">
+          <User className="h-4 w-4 text-primary-600" />
+          <span className="text-sm font-medium text-primary-800">
+            Finding gifts for {recipientName}
+            {recipientRelationship ? ` (${recipientRelationship})` : ""}
+          </span>
+        </div>
+      )}
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">
