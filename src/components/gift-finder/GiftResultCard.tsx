@@ -4,6 +4,7 @@ import { useState } from "react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import GiftMessageWriter from "./GiftMessageWriter";
 import { formatPriceRange } from "@/lib/utils";
 import {
   Bookmark,
@@ -12,6 +13,7 @@ import {
   ShoppingCart,
   Star,
   AlertTriangle,
+  Scale,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,6 +29,9 @@ interface GiftResultCardProps {
   isSaved?: boolean;
   isGiven?: boolean;
   regiftWarning?: boolean;
+  recipientDescription?: string;
+  isComparing?: boolean;
+  onToggleCompare?: (id: string) => void;
 }
 
 export default function GiftResultCard({
@@ -41,6 +46,9 @@ export default function GiftResultCard({
   isSaved: initialSaved = false,
   isGiven: initialGiven = false,
   regiftWarning = false,
+  recipientDescription = "",
+  isComparing = false,
+  onToggleCompare,
 }: GiftResultCardProps) {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isGiven, setIsGiven] = useState(initialGiven);
@@ -93,8 +101,14 @@ export default function GiftResultCard({
     window.open(urls[store], "_blank");
   }
 
+  const storeButtons = [
+    { key: "amazon" as const, label: "Amazon", color: "hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200" },
+    { key: "flipkart" as const, label: "Flipkart", color: "hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200" },
+    { key: "meesho" as const, label: "Meesho", color: "hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200" },
+  ];
+
   return (
-    <Card className={`flex flex-col h-full ${regiftWarning ? "ring-2 ring-warning/50" : ""}`}>
+    <Card className={`flex flex-col h-full ${regiftWarning ? "ring-2 ring-warning/50" : ""} ${isComparing ? "ring-2 ring-primary-500" : ""}`}>
       {regiftWarning && (
         <div className="flex items-center gap-2 bg-warning/10 text-warning rounded-lg px-3 py-2 mb-3 text-xs font-medium">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
@@ -111,7 +125,22 @@ export default function GiftResultCard({
             {formatPriceRange(estimatedPriceMin, estimatedPriceMax)}
           </p>
         </div>
-        <Badge category={category}>{category}</Badge>
+        <div className="flex items-center gap-2 shrink-0">
+          {onToggleCompare && (
+            <button
+              onClick={() => onToggleCompare(id)}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isComparing
+                  ? "bg-primary-100 text-primary-600"
+                  : "text-text-tertiary hover:bg-surface-secondary hover:text-text-secondary"
+              }`}
+              title={isComparing ? "Remove from compare" : "Add to compare"}
+            >
+              <Scale className="h-4 w-4" />
+            </button>
+          )}
+          <Badge category={category}>{category}</Badge>
+        </div>
       </div>
 
       <p className="text-sm text-text-secondary mb-3">{description}</p>
@@ -154,38 +183,32 @@ export default function GiftResultCard({
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => openStore("amazon")}
-            title="Search on Amazon"
-            className="w-full"
-          >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            Amazon
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => openStore("flipkart")}
-            title="Search on Flipkart"
-            className="w-full"
-          >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            Flipkart
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => openStore("meesho")}
-            title="Search on Meesho"
-            className="w-full"
-          >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            Meesho
-          </Button>
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-text-tertiary flex items-center gap-1">
+            <ShoppingCart className="h-3 w-3" />
+            Find best price
+          </p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {storeButtons.map((store) => (
+              <button
+                key={store.key}
+                onClick={() => openStore(store.key)}
+                className={`px-2.5 py-1.5 rounded-lg border border-border text-xs font-medium text-text-secondary transition-all ${store.color}`}
+              >
+                {store.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-text-tertiary">
+            {purchaseKeywords.slice(0, 3).join(" · ")}
+          </p>
         </div>
+
+        <GiftMessageWriter
+          giftTitle={title}
+          recipientDescription={recipientDescription}
+          whyItsPerfect={whyItsPerfect}
+        />
       </div>
     </Card>
   );

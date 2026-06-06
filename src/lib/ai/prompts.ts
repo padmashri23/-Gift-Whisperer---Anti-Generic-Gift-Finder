@@ -40,3 +40,52 @@ Each object in the array must have these exact keys:
   "purchaseKeywords": ["keyword1", "keyword2", "keyword3"]
 }`;
 }
+
+export function buildFollowUpPrompt(
+  description: string,
+  occasion?: string
+): string {
+  return `You are Gift Whisperer, an expert at asking the RIGHT questions to find the perfect gift.
+
+The user has described someone they want to buy a gift for:
+"${description}"
+${occasion ? `Occasion: ${occasion}` : ""}
+
+Based on this description, generate exactly 3 smart follow-up questions that would help narrow down the perfect gift. Each question should:
+1. Be specific to what the user described (not generic)
+2. Help distinguish between different gift directions
+3. Include 3-4 short answer options the user can quickly pick from
+
+Respond ONLY with a JSON array. No markdown, no code fences.
+Each object must have:
+{
+  "question": "the question text",
+  "options": ["option1", "option2", "option3"]
+}
+
+Example: If user says "my dad who loves cooking", a good question would be:
+{"question": "Does he prefer experimenting with new cuisines or perfecting classics?", "options": ["Experimenting with new cuisines", "Perfecting classic recipes", "Both equally", "He's just getting started"]}`;
+}
+
+export function buildMessagePrompt(input: {
+  giftTitle: string;
+  recipientDescription: string;
+  whyItsPerfect: string;
+  tone?: string;
+}): string {
+  const tone = input.tone || "heartfelt";
+  return `You are Gift Whisperer, helping someone write a personal note to go with a gift.
+
+Gift: "${input.giftTitle}"
+About the recipient: "${input.recipientDescription}"
+Why this gift was chosen: "${input.whyItsPerfect}"
+Desired tone: ${tone}
+
+Write a short, personal gift note (2-4 sentences) that:
+1. Feels genuine and specific to the recipient, not generic
+2. References why you thought of this gift for them specifically
+3. Matches the "${tone}" tone
+4. Does NOT mention the price or where it was bought
+
+Respond with a JSON object: {"message": "the note text"}`;
+}

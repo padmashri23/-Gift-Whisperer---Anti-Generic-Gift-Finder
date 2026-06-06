@@ -9,7 +9,17 @@ import BudgetFilter from "@/components/gift-finder/BudgetFilter";
 import GiftResultCard from "@/components/gift-finder/GiftResultCard";
 import GeneratingAnimation from "@/components/gift-finder/GeneratingAnimation";
 import PersonalityQuiz from "@/components/gift-finder/PersonalityQuiz";
-import { Sparkles, ChevronDown, ChevronUp, ClipboardList } from "lucide-react";
+import FollowUpQuestions from "@/components/gift-finder/FollowUpQuestions";
+import CompareDrawer from "@/components/gift-finder/CompareDrawer";
+import ShareModal from "@/components/gift-finder/ShareModal";
+import {
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  ClipboardList,
+  Scale,
+  Share2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface GiftIdea {
@@ -26,6 +36,11 @@ interface GiftIdea {
   regift_warning?: boolean;
 }
 
+interface FollowUpQuestion {
+  question: string;
+  options: string[];
+}
+
 export default function FindPage() {
   const [description, setDescription] = useState("");
   const [occasion, setOccasion] = useState("");
@@ -37,10 +52,74 @@ export default function FindPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
 
-  async function handleGenerate(e?: React.FormEvent) {
+  // Follow-up questions state
+  const [followUpQuestions, setFollowUpQuestions] = useState<FollowUpQuestion[]>([]);
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [followUpLoading, setFollowUpLoading] = useState(false);
+  const [followUpAnswers, setFollowUpAnswers] = useState<string[]>([]);
+
+  // Compare state
+  const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
+  const [showCompare, setShowCompare] = useState(false);
+
+  // Share state
+  const [showShare, setShowShare] = useState(false);
+
+  async function fetchFollowUpQuestions() {
+    if (description.trim().length < 10) {
+      toast.error("Please describe the recipient in at least 10 characters");
+      return;
+    }
+
+    setFollowUpLoading(true);
+    try {
+      const res = await fetch("/api/ai/follow-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: description.trim(),
+          occasion: occasion || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      if (data.questions && data.questions.length > 0) {
+        setFollowUpQuestions(data.questions);
+        setShowFollowUp(true);
+      } else {
+        handleGenerate();
+      }
+    } catch {
+      handleGenerate();
+    } finally {
+      setFollowUpLoading(false);
+    }
+  }
+
+  function handleFollowUpComplete(answers: string[]) {
+    setFollowUpAnswers(answers);
+    setShowFollowUp(false);
+
+    const enriched =
+      description.trim() +
+      "\n\nAdditional context from follow-up:\n" +
+      answers.map((a, i) => `- ${followUpQuestions[i]?.question}: ${a}`).join("\n");
+
+    handleGenerate(undefined, enriched);
+  }
+
+  function handleFollowUpSkip() {
+    setShowFollowUp(false);
+    handleGenerate();
+  }
+
+  async function handleGenerate(e?: React.FormEvent, enrichedDescription?: string) {
     if (e) e.preventDefault();
 
-    if (description.trim().length < 10) {
+    const desc = enrichedDescription || description.trim();
+    if (desc.length < 10) {
       toast.error("Please describe the recipient in at least 10 characters");
       return;
     }
@@ -48,13 +127,14 @@ export default function FindPage() {
     setLoading(true);
     setResults([]);
     setHasSearched(true);
+    setCompareIds(new Set());
 
     try {
       const res = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          description: description.trim(),
+          description: desc,
           occasion: occasion || undefined,
           budgetMin,
           budgetMax,
@@ -78,11 +158,58 @@ export default function FindPage() {
     }
   }
 
-  function handleQuizComplete(result: { description: string; interests: string[] }) {
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    fetchFollowUpQuestions();
+  }
+
+  function handleQuizComplete(result: {
+    description: string;
+    interests: string[];
+  }) {
     setDescription(result.description);
     setShowQuiz(false);
-    toast.success("Quiz complete! Description filled in. Review and hit Generate.");
+    toast.success(
+      "Quiz complete! Description filled in. Review and hit Generate."
+    );
   }
+
+  function toggleCompare(id: string) {
+    setCompareIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else if (next.size < 3) {
+        next.add(id);
+      } else {
+        toast.error("You can compare up to 3 gifts at a time");
+        return prev;
+      }
+      return next;
+    });
+  }
+
+  function removeFromCompare(id: string) {
+    setCompareIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  const compareGifts = results
+    .filter((r) => compareIds.has(r.id))
+    .map((r) => ({
+      id: r.id,
+      title: r.title,
+      description: r.description,
+      estimatedPriceMin: r.estimated_price_min,
+      estimatedPriceMax: r.estimated_price_max,
+      whyItsPerfect: r.why_its_perfect,
+      category: r.category,
+    }));
+
+  const shareGifts = results.map((r) => ({ id: r.id, title: r.title }));
 
   if (showQuiz) {
     return (
@@ -116,9 +243,12 @@ export default function FindPage() {
       </div>
 
       <Card>
-        <form onSubmit={handleGenerate} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex items-center justify-between">
-            <label htmlFor="description" className="block text-sm font-medium text-text-primary">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-text-primary"
+            >
               Who are you shopping for?
             </label>
             <Button
@@ -174,33 +304,79 @@ export default function FindPage() {
             type="submit"
             size="lg"
             className="w-full"
-            loading={loading}
+            loading={loading || followUpLoading}
             disabled={description.trim().length < 10}
           >
             <Sparkles className="h-5 w-5" />
-            {loading ? "Whispering..." : "Find Gift Ideas"}
+            {loading
+              ? "Whispering..."
+              : followUpLoading
+              ? "Thinking..."
+              : "Find Gift Ideas"}
           </Button>
         </form>
       </Card>
+
+      {showFollowUp && followUpQuestions.length > 0 && (
+        <FollowUpQuestions
+          questions={followUpQuestions}
+          onComplete={handleFollowUpComplete}
+          onSkip={handleFollowUpSkip}
+          loading={loading}
+        />
+      )}
 
       {loading && <GeneratingAnimation />}
 
       {!loading && results.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="text-lg font-semibold text-text-primary">
               Gift Ideas for You
             </h2>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleGenerate()}
-              disabled={loading}
-            >
-              <Sparkles className="h-4 w-4" />
-              Regenerate
-            </Button>
+            <div className="flex items-center gap-2">
+              {compareIds.size >= 2 && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowCompare(true)}
+                >
+                  <Scale className="h-4 w-4" />
+                  Compare ({compareIds.size})
+                </Button>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowShare(true)}
+              >
+                <Share2 className="h-4 w-4" />
+                Share
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleGenerate()}
+                disabled={loading}
+              >
+                <Sparkles className="h-4 w-4" />
+                Regenerate
+              </Button>
+            </div>
           </div>
+
+          {followUpAnswers.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {followUpAnswers.map((a, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center rounded-full bg-accent-50 px-2.5 py-0.5 text-xs font-medium text-accent-700 border border-accent-200"
+                >
+                  {a}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {results.map((idea) => (
@@ -217,6 +393,9 @@ export default function FindPage() {
                 isSaved={idea.is_saved}
                 isGiven={idea.is_given}
                 regiftWarning={idea.regift_warning}
+                recipientDescription={description}
+                isComparing={compareIds.has(idea.id)}
+                onToggleCompare={toggleCompare}
               />
             ))}
           </div>
@@ -230,6 +409,21 @@ export default function FindPage() {
             adjusting the budget.
           </p>
         </Card>
+      )}
+
+      {showCompare && compareGifts.length >= 2 && (
+        <CompareDrawer
+          gifts={compareGifts}
+          onClose={() => setShowCompare(false)}
+          onRemove={removeFromCompare}
+        />
+      )}
+
+      {showShare && (
+        <ShareModal
+          gifts={shareGifts}
+          onClose={() => setShowShare(false)}
+        />
       )}
     </div>
   );

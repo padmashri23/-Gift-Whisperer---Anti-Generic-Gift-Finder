@@ -11,7 +11,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--surface)]">
       {/* Header */}
-      <header className="border-b border-border bg-[var(--card-bg)]">
+      <header className="border-b border-border bg-[var(--card-bg)]/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="mx-auto flex h-16 w-full max-w-[19rem] items-center justify-between px-4 sm:max-w-6xl sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
@@ -42,9 +42,9 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-[var(--surface)] to-accent-50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--hero-from)] via-[var(--hero-via)] to-[var(--hero-to)]" />
         <div className="relative mx-auto w-full max-w-[19rem] px-4 py-20 text-center sm:max-w-6xl sm:px-6 sm:py-32">
-          <div className="inline-flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-4 py-1.5 text-sm text-primary-700 font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-[var(--badge-bg)] border border-[var(--badge-border)] rounded-full px-4 py-1.5 text-sm text-[var(--badge-text)] font-medium mb-6">
             <Sparkles className="h-4 w-4" />
             AI-Powered Gift Recommendations
           </div>
@@ -61,14 +61,15 @@ export default function LandingPage() {
           <div className="mx-auto mt-10 flex w-full max-w-[19rem] flex-col items-center justify-center gap-4 sm:max-w-none sm:flex-row">
             <Link
               href="/signup"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-200 transition-colors hover:bg-primary-700 sm:w-auto sm:px-8"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary-700 hover:scale-105 sm:w-auto sm:px-8"
+              style={{ boxShadow: "0 10px 25px -5px var(--shadow-cta)" }}
             >
               <Sparkles className="h-5 w-5" />
               Start Finding Gifts
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3.5 text-base font-medium text-text-secondary transition-colors hover:bg-surface-secondary sm:w-auto sm:px-8"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3.5 text-base font-medium text-text-secondary transition-colors hover:bg-[var(--surface-secondary)] sm:w-auto sm:px-8"
             >
               See How It Works
             </Link>
@@ -77,10 +78,10 @@ export default function LandingPage() {
       </section>
 
       {/* Example */}
-      <section className="py-16 bg-surface-secondary border-y border-border">
+      <section className="py-16 bg-[var(--surface-secondary)] border-y border-border">
         <div className="mx-auto w-full max-w-[19rem] px-4 sm:max-w-4xl sm:px-6">
           <div className="overflow-hidden rounded-2xl border border-border bg-[var(--card-bg)] shadow-lg">
-            <div className="p-6 border-b border-border bg-surface-secondary">
+            <div className="p-6 border-b border-border bg-[var(--surface-secondary)]">
               <p className="text-sm text-text-tertiary mb-2">You type:</p>
               <p className="break-words text-text-primary italic">
                 &ldquo;My friend who just got into pottery but is intimidated by
@@ -97,25 +98,25 @@ export default function LandingPage() {
                   {
                     title: 'Home Pottery Kit with "The Ceramics Bible"',
                     why: "Perfect for a beginner who wants to practice in their comfort zone before hitting the studio",
-                    price: "$45-$65",
+                    price: "₹3,500 - ₹5,500",
                     category: "hobby-gear",
                   },
                   {
                     title: "Chairman Meow Custom Cat Portrait",
                     why: "A hand-illustrated portrait of their cat, because that name deserves to be immortalized",
-                    price: "$30-$60",
+                    price: "₹2,500 - ₹5,000",
                     category: "handmade",
                   },
                   {
                     title: "Podcast Microphone Starter Kit",
                     why: "For someone who loves weird podcasts so much they might want to start their own",
-                    price: "$50-$80",
+                    price: "₹4,000 - ₹6,500",
                     category: "tech",
                   },
                 ].map((gift) => (
                   <div
                     key={gift.title}
-                    className="flex min-w-0 items-start gap-3 rounded-lg bg-surface-secondary p-3"
+                    className="flex min-w-0 items-start gap-3 rounded-lg bg-[var(--surface-secondary)] p-3"
                   >
                     <Gift className="h-5 w-5 text-primary-500 mt-0.5 flex-shrink-0" />
                     <div className="min-w-0">
@@ -165,8 +166,8 @@ export default function LandingPage() {
               },
             ].map((step) => (
               <div key={step.title} className="text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-100 mb-4">
-                  <step.icon className="h-7 w-7 text-primary-600" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--step-icon-bg)] mb-4">
+                  <step.icon className="h-7 w-7 text-[var(--step-icon-text)]" />
                 </div>
                 <h3 className="text-lg font-semibold text-text-primary mb-2">
                   {step.title}
@@ -181,7 +182,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 bg-surface-secondary border-y border-border">
+      <section className="py-20 bg-[var(--surface-secondary)] border-y border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
             More Than Suggestions
@@ -236,7 +237,8 @@ export default function LandingPage() {
           </p>
           <Link
             href="/signup"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-200 transition-colors hover:bg-primary-700"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-primary-700 hover:scale-105"
+            style={{ boxShadow: "0 10px 25px -5px var(--shadow-cta)" }}
           >
             <Gift className="h-5 w-5" />
             Get Started Free

@@ -168,6 +168,41 @@ export interface Database {
         };
         Relationships: [];
       };
+      shared_lists: {
+        Row: {
+          id: string;
+          user_id: string;
+          share_token: string;
+          title: string;
+          description: string | null;
+          gift_ids: string[];
+          recipient_name: string | null;
+          occasion: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          share_token?: string;
+          title: string;
+          description?: string | null;
+          gift_ids: string[];
+          recipient_name?: string | null;
+          occasion?: string | null;
+          is_active?: boolean;
+        };
+        Update: {
+          title?: string;
+          description?: string | null;
+          gift_ids?: string[];
+          recipient_name?: string | null;
+          occasion?: string | null;
+          is_active?: boolean;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

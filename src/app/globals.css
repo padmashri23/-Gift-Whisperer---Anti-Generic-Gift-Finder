@@ -49,6 +49,15 @@
   --text-tertiary: #9ca3af;
   --card-bg: #ffffff;
   --input-bg: #ffffff;
+  --hero-from: #fdf2f8;
+  --hero-via: #ffffff;
+  --hero-to: #f5f3ff;
+  --badge-bg: #fdf2f8;
+  --badge-border: #fbcfe8;
+  --badge-text: #be185d;
+  --step-icon-bg: #fce7f3;
+  --step-icon-text: #db2777;
+  --shadow-cta: rgba(251, 207, 232, 0.5);
 }
 
 .dark {
@@ -62,6 +71,15 @@
   --text-tertiary: #64748b;
   --card-bg: #1e293b;
   --input-bg: #1e293b;
+  --hero-from: #0f172a;
+  --hero-via: #0f172a;
+  --hero-to: #1a1033;
+  --badge-bg: rgba(139, 92, 246, 0.15);
+  --badge-border: rgba(139, 92, 246, 0.3);
+  --badge-text: #c4b5fd;
+  --step-icon-bg: rgba(236, 72, 153, 0.15);
+  --step-icon-text: #f9a8d4;
+  --shadow-cta: rgba(139, 92, 246, 0.3);
 }
 
 body {
