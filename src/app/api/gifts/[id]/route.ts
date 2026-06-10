@@ -9,12 +9,13 @@ export async function PUT(
   const { id } = await params;
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const user = session.user;
 
   const body = await request.json();
   const parsed = GiftUpdateSchema.safeParse(body);
@@ -48,12 +49,13 @@ export async function DELETE(
   const { id } = await params;
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const user = session.user;
 
   const { error } = await supabase
     .from("gift_ideas")

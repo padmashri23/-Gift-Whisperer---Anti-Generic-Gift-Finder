@@ -77,41 +77,48 @@ export default function FindPage() {
     async function init() {
       const supabase = createClient();
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
         setInitLoading(false);
         return;
       }
 
-      const { data: profile } = await supabase
+      const userId = session.user.id;
+      const profilePromise = supabase
         .from("profiles")
         .select("default_budget_min, default_budget_max")
-        .eq("id", user.id)
+        .eq("id", userId)
         .single();
+
+      const recipientPromise = recipientId
+        ? supabase
+            .from("recipients")
+            .select("name, relationship, description, interests")
+            .eq("id", recipientId)
+            .eq("user_id", userId)
+            .single()
+        : null;
+
+      const [{ data: profile }, recipientResult] = await Promise.all([
+        profilePromise,
+        recipientPromise,
+      ]);
 
       if (profile) {
         setBudgetMin(profile.default_budget_min);
         setBudgetMax(profile.default_budget_max);
       }
 
-      if (recipientId) {
-        const { data: recipient } = await supabase
-          .from("recipients")
-          .select("name, relationship, description, interests")
-          .eq("id", recipientId)
-          .eq("user_id", user.id)
-          .single();
-
-        if (recipient) {
-          setRecipientName(recipient.name);
-          setRecipientRelationship(recipient.relationship || "");
-          setRecipientInterests(recipient.interests || []);
-          if (recipient.description) {
-            setDescription(recipient.description);
-          }
-          setShowOptions(true);
+      if (recipientResult?.data) {
+        const recipient = recipientResult.data;
+        setRecipientName(recipient.name);
+        setRecipientRelationship(recipient.relationship || "");
+        setRecipientInterests(recipient.interests || []);
+        if (recipient.description) {
+          setDescription(recipient.description);
         }
+        setShowOptions(true);
       }
 
       setInitLoading(false);

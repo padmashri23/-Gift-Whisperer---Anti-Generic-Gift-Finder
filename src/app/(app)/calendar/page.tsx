@@ -40,16 +40,25 @@ export default function CalendarPage() {
     async function loadEvents() {
       const supabase = createClient();
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return;
 
+      const userId = session.user.id;
       const calendarEvents: CalendarEvent[] = [];
 
-      const { data: recipients } = await supabase
-        .from("recipients")
-        .select("name, important_dates")
-        .eq("user_id", user.id);
+      const [{ data: recipients }, { data: givenGifts }] = await Promise.all([
+        supabase
+          .from("recipients")
+          .select("name, important_dates")
+          .eq("user_id", userId),
+        supabase
+          .from("gift_ideas")
+          .select("title, given_date, category")
+          .eq("user_id", userId)
+          .eq("is_given", true)
+          .not("given_date", "is", null),
+      ]);
 
       if (recipients) {
         for (const r of recipients) {
@@ -68,13 +77,6 @@ export default function CalendarPage() {
           }
         }
       }
-
-      const { data: givenGifts } = await supabase
-        .from("gift_ideas")
-        .select("title, given_date, category")
-        .eq("user_id", user.id)
-        .eq("is_given", true)
-        .not("given_date", "is", null);
 
       if (givenGifts) {
         for (const g of givenGifts) {

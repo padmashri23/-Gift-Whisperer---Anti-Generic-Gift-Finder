@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
@@ -9,6 +10,7 @@ import Link from "next/link";
 import type { Recipient } from "@/types/recipient";
 
 export default function RecipientsPage() {
+  const router = useRouter();
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -125,7 +127,7 @@ export default function RecipientsPage() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      window.location.href = `/find?recipientId=${recipient.id}`;
+                      router.push(`/find?recipientId=${recipient.id}`);
                     }}
                     className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
                   >

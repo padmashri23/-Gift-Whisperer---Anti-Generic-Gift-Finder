@@ -23,16 +23,16 @@ export default function SettingsPage() {
     async function load() {
       const supabase = createClient();
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return;
 
-      setEmail(user.email || "");
+      setEmail(session.user.email || "");
 
       const { data } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("id", session.user.id)
         .single();
 
       if (data) {
@@ -57,9 +57,9 @@ export default function SettingsPage() {
 
     const supabase = createClient();
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return;
 
     const { error } = await supabase
       .from("profiles")
@@ -69,7 +69,7 @@ export default function SettingsPage() {
         default_budget_max: budgetMax,
         preferred_currency: "INR",
       })
-      .eq("id", user.id);
+      .eq("id", session.user.id);
 
     if (error) {
       toast.error("Failed to save settings");
