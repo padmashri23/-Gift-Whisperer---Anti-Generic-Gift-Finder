@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
@@ -16,12 +15,11 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
-
   useEffect(() => {
     const urlError = searchParams.get("error");
     if (urlError === "auth_callback_failed") {
       setError("Authentication failed. Please try again.");
-    }
+    }  
   }, [searchParams]);
 
   async function handleLogin(e: React.FormEvent) {
