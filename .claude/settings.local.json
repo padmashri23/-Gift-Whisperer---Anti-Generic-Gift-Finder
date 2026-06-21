@@ -9,7 +9,8 @@
       "Bash(npx next *)",
       "Bash(echo \"started pid $!\")",
       "Bash(sleep 8; cat \"C:\\\\Users\\\\padma\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-padma-OneDrive-Desktop-Projects-Gift-Whisperer\\\\d0edc112-0986-4939-8f41-46760e0a2f02\\\\tasks\\\\bascu2wla.output\" 2>/dev/null; echo \"=== devlog ===\"; tail -8 /tmp/gw_dev.log)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "mcp__supabase__get_advisors"
     ]
   },
   "enableAllProjectMcpServers": true,

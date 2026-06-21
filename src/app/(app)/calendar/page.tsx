@@ -63,89 +63,99 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<UserCalendarEvent | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const loadEvents = useCallback(async () => {
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      setLoading(false);
-      return;
-    }
+  const refreshEvents = useCallback(() => setRefreshKey((k) => k + 1), []);
 
-    const userId = session.user.id;
-    const calendarEvents: CalendarEvent[] = [];
+  useEffect(() => {
+    let active = true;
 
-    const [{ data: recipients }, { data: givenGifts }, { data: userEvents }] =
-      await Promise.all([
-        supabase
-          .from("recipients")
-          .select("name, important_dates")
-          .eq("user_id", userId),
-        supabase
-          .from("gift_ideas")
-          .select("title, given_date, category")
-          .eq("user_id", userId)
-          .eq("is_given", true)
-          .not("given_date", "is", null),
-        supabase
-          .from("calendar_events")
-          .select("*")
-          .eq("user_id", userId),
-      ]);
+    async function loadEvents() {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        if (active) setLoading(false);
+        return;
+      }
 
-    if (recipients) {
-      for (const r of recipients) {
-        if (r.important_dates && Array.isArray(r.important_dates)) {
-          for (const d of r.important_dates) {
-            const dateObj = d as { label: string; date: string };
-            if (dateObj.date) {
-              calendarEvents.push({
-                date: dateObj.date,
-                label: dateObj.label || "Event",
-                type: "occasion",
-                recipientName: r.name,
-              });
+      const userId = session.user.id;
+      const calendarEvents: CalendarEvent[] = [];
+
+      const [{ data: recipients }, { data: givenGifts }, { data: userEvents }] =
+        await Promise.all([
+          supabase
+            .from("recipients")
+            .select("name, important_dates")
+            .eq("user_id", userId),
+          supabase
+            .from("gift_ideas")
+            .select("title, given_date, category")
+            .eq("user_id", userId)
+            .eq("is_given", true)
+            .not("given_date", "is", null),
+          supabase
+            .from("calendar_events")
+            .select("*")
+            .eq("user_id", userId),
+        ]);
+
+      if (recipients) {
+        for (const r of recipients) {
+          if (r.important_dates && Array.isArray(r.important_dates)) {
+            for (const d of r.important_dates) {
+              const dateObj = d as { label: string; date: string };
+              if (dateObj.date) {
+                calendarEvents.push({
+                  date: dateObj.date,
+                  label: dateObj.label || "Event",
+                  type: "occasion",
+                  recipientName: r.name,
+                });
+              }
             }
           }
         }
       }
-    }
 
-    if (givenGifts) {
-      for (const g of givenGifts) {
-        calendarEvents.push({
-          date: g.given_date!,
-          label: "Gift given",
-          type: "gift-given",
-          giftTitle: g.title,
-          category: g.category,
-        });
+      if (givenGifts) {
+        for (const g of givenGifts) {
+          calendarEvents.push({
+            date: g.given_date!,
+            label: "Gift given",
+            type: "gift-given",
+            giftTitle: g.title,
+            category: g.category,
+          });
+        }
+      }
+
+      if (userEvents) {
+        for (const ev of userEvents as UserCalendarEvent[]) {
+          calendarEvents.push({
+            date: ev.event_date,
+            label: ev.title,
+            type: "custom",
+            isRecurring: ev.is_recurring,
+            notes: ev.notes,
+            eventType: ev.event_type,
+            userEvent: ev,
+          });
+        }
+      }
+
+      if (active) {
+        setEvents(calendarEvents);
+        setLoading(false);
       }
     }
 
-    if (userEvents) {
-      for (const ev of userEvents as UserCalendarEvent[]) {
-        calendarEvents.push({
-          date: ev.event_date,
-          label: ev.title,
-          type: "custom",
-          isRecurring: ev.is_recurring,
-          notes: ev.notes,
-          eventType: ev.event_type,
-          userEvent: ev,
-        });
-      }
-    }
-
-    setEvents(calendarEvents);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
     loadEvents();
-  }, [loadEvents]);
+    return () => {
+      active = false;
+    };
+  }, [refreshKey]);
 
   const calendarDays = useMemo(() => {
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -428,7 +438,7 @@ export default function CalendarPage() {
           date={selectedDate ?? `${currentYear}-${pad(currentMonth + 1)}-${pad(today.getDate())}`}
           existing={editingEvent ?? undefined}
           onClose={() => setModalOpen(false)}
-          onSaved={loadEvents}
+          onSaved={refreshEvents}
         />
       )}
     </div>

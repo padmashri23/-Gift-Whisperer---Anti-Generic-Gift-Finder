@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import AvatarUpload from "@/components/ui/AvatarUpload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { User, IndianRupee, Shield, LogOut, Save, Mail } from "lucide-react";
@@ -12,6 +13,8 @@ import { User, IndianRupee, Shield, LogOut, Save, Mail } from "lucide-react";
 export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [budgetMin, setBudgetMin] = useState(0);
   const [budgetMax, setBudgetMax] = useState(5000);
   const [loading, setLoading] = useState(false);
@@ -28,6 +31,7 @@ export default function SettingsPage() {
       if (!session) return;
 
       setEmail(session.user.email || "");
+      setUserId(session.user.id);
 
       const { data } = await supabase
         .from("profiles")
@@ -39,11 +43,30 @@ export default function SettingsPage() {
         setDisplayName(data.display_name || "");
         setBudgetMin(data.default_budget_min);
         setBudgetMax(data.default_budget_max);
+        setAvatarUrl(data.avatar_url || null);
       }
       setFetching(false);
     }
     load();
   }, []);
+
+  async function handleAvatarUpload(url: string) {
+    setAvatarUrl(url);
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: url })
+      .eq("id", session.user.id);
+
+    if (error) {
+      toast.error("Photo uploaded but couldn't be saved to your profile");
+    }
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -67,6 +90,7 @@ export default function SettingsPage() {
         display_name: displayName,
         default_budget_min: budgetMin,
         default_budget_max: budgetMax,
+        avatar_url: avatarUrl,
         preferred_currency: "INR",
       })
       .eq("id", session.user.id);
@@ -113,6 +137,18 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2 mb-1">
             <User className="h-5 w-5 text-primary-600" />
             <h2 className="text-lg font-semibold text-text-primary">Profile</h2>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              Profile photo
+            </label>
+            <AvatarUpload
+              currentUrl={avatarUrl}
+              onUpload={handleAvatarUpload}
+              folder={userId || "avatars"}
+              size={80}
+            />
           </div>
 
           <Input
