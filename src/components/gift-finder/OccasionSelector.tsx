@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { FESTIVALS } from "@/lib/ai/festivals";
 
 const occasions = [
   { label: "Birthday", emoji: "🎂" },
@@ -17,6 +18,12 @@ const occasions = [
   { label: "Just Because", emoji: "✨" },
 ];
 
+// Festival chips, excluding any occasion already shown in the general list above.
+const generalLabels = new Set(occasions.map((o) => o.label.toLowerCase()));
+const festivalOccasions = FESTIVALS.filter(
+  (f) => !generalLabels.has(f.label.toLowerCase())
+).map((f) => ({ label: f.label, emoji: f.emoji }));
+
 interface OccasionSelectorProps {
   value: string;
   onChange: (value: string) => void;
@@ -26,30 +33,39 @@ export default function OccasionSelector({
   value,
   onChange,
 }: OccasionSelectorProps) {
+  function renderChip(occasion: { label: string; emoji: string }) {
+    return (
+      <button
+        key={occasion.label}
+        type="button"
+        onClick={() => onChange(value === occasion.label ? "" : occasion.label)}
+        className={cn(
+          "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
+          value === occasion.label
+            ? "bg-primary-50 border-primary-300 text-primary-700 dark:bg-primary-900/30 dark:text-primary-100"
+            : "bg-[var(--input-bg)] border-border text-text-secondary hover:bg-surface-secondary"
+        )}
+      >
+        <span>{occasion.emoji}</span>
+        {occasion.label}
+      </button>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-text-primary">
         Occasion
       </label>
       <div className="flex flex-wrap gap-2">
-        {occasions.map((occasion) => (
-          <button
-            key={occasion.label}
-            type="button"
-            onClick={() =>
-              onChange(value === occasion.label ? "" : occasion.label)
-            }
-            className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
-              value === occasion.label
-                ? "bg-primary-50 border-primary-300 text-primary-700 dark:bg-primary-900/30 dark:text-primary-100"
-                : "bg-[var(--input-bg)] border-border text-text-secondary hover:bg-surface-secondary"
-            )}
-          >
-            <span>{occasion.emoji}</span>
-            {occasion.label}
-          </button>
-        ))}
+        {occasions.map(renderChip)}
+      </div>
+
+      <p className="text-xs font-medium text-text-tertiary pt-1.5">
+        Indian Festivals
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {festivalOccasions.map(renderChip)}
       </div>
     </div>
   );

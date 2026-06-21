@@ -1,10 +1,16 @@
 import type { GiftGenerationRequest } from "@/types/ai";
+import { getFestivalGuidance } from "./festivals";
 
 export function buildGiftPrompt(req: GiftGenerationRequest): string {
   const exclusionBlock =
     req.excludeGifts && req.excludeGifts.length > 0
       ? `\n\nIMPORTANT: The user has already given or considered these gifts. Do NOT suggest them again:\n${req.excludeGifts.map((g) => `- ${g}`).join("\n")}`
       : "";
+
+  const festivalGuidance = getFestivalGuidance(req.occasion);
+  const festivalBlock = festivalGuidance
+    ? `\n\n## Festival Context\nThis gift is for an Indian festival. Honour these cultural gifting norms while staying personal to the recipient:\n${festivalGuidance}`
+    : "";
 
   return `You are Gift Whisperer, an extraordinarily creative and thoughtful gift recommendation expert.
 You specialize in finding hyper-specific, personal gifts that show deep understanding of the recipient.
@@ -18,7 +24,7 @@ Description: ${req.description}
 ${req.interests && req.interests.length > 0 ? `Known interests: ${req.interests.join(", ")}` : ""}
 ${req.occasion ? `Occasion: ${req.occasion}` : "Occasion: Not specified"}
 Budget: ₹${req.budgetMin ?? 0} - ₹${req.budgetMax ?? 5000} INR
-${exclusionBlock}
+${exclusionBlock}${festivalBlock}
 
 ## Instructions
 Generate exactly 5 unique, creative gift ideas. For each gift:
@@ -65,6 +71,42 @@ Each object must have:
 
 Example: If user says "my dad who loves cooking", a good question would be:
 {"question": "Does he prefer experimenting with new cuisines or perfecting classics?", "options": ["Experimenting with new cuisines", "Perfecting classic recipes", "Both equally", "He's just getting started"]}`;
+}
+
+export function buildDecodeHintPrompt(input: {
+  text?: string;
+  hasImage?: boolean;
+  occasion?: string;
+}): string {
+  const sources: string[] = [];
+  if (input.text && input.text.trim()) {
+    sources.push(`Something they said or wrote:\n"${input.text.trim()}"`);
+  }
+  if (input.hasImage) {
+    sources.push(
+      "An attached screenshot (e.g. a chat message, social post, or wishlist). Read any text in the image and interpret the mood and context."
+    );
+  }
+
+  return `You are Gift Whisperer, an expert at reading between the lines to find hidden gift signals.
+
+A user has captured something a person they want to gift said, wrote, or shared. Your job is to DECODE the latent gift signals — the wants, frustrations, hobbies, and personality cues hiding inside.
+
+## Source material
+${sources.join("\n\n")}
+${input.occasion ? `\nOccasion: ${input.occasion}` : ""}
+
+## Instructions
+1. Identify concrete gift signals (e.g. "headphones keep dying" -> needs new headphones; "obsessed with this band" -> music/merch).
+2. Infer interests, hobbies, and personality traits implied by the tone and content.
+3. Write a rich 2-4 sentence recipient description that a gift expert could act on. Write it in third person ("They ...") and weave in the decoded signals naturally. Do NOT quote the source verbatim or mention that it came from a screenshot/message.
+
+Respond ONLY with a JSON object. No markdown, no code fences. Use these exact keys:
+{
+  "description": "2-4 sentence recipient description weaving in the decoded signals",
+  "signals": ["short phrase of a detected gift signal", "another signal"],
+  "interests": ["interest1", "interest2"]
+}`;
 }
 
 export function buildMessagePrompt(input: {

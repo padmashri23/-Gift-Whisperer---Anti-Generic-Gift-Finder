@@ -1,8 +1,25 @@
 import type { GiftGenerationRequest, GiftGenerationResult } from "@/types/ai";
-import { generateWithGemini, GEMINI_MODEL } from "./gemini";
+import {
+  generateWithGemini,
+  generateWithGeminiVision,
+  GEMINI_MODEL,
+  type InlineImage,
+} from "./gemini";
 import { generateWithGroq, GROQ_MODEL } from "./groq";
-import { buildGiftPrompt, buildFollowUpPrompt, buildMessagePrompt } from "./prompts";
+import {
+  buildGiftPrompt,
+  buildFollowUpPrompt,
+  buildMessagePrompt,
+  buildDecodeHintPrompt,
+} from "./prompts";
 import { parseGiftResponse } from "./parse-response";
+
+function stripJsonFences(raw: string): string {
+  return raw
+    .replace(/^```(?:json)?\s*\n?/m, "")
+    .replace(/\n?```\s*$/m, "")
+    .trim();
+}
 
 async function callAI(prompt: string): Promise<string> {
   if (process.env.GEMINI_API_KEY) {
@@ -87,6 +104,65 @@ export async function generateFollowUpQuestions(
     : (parsed as Record<string, unknown>).questions ?? [];
 
   return (questions as { question: string; options: string[] }[]).slice(0, 3);
+}
+
+export interface DecodedHint {
+  description: string;
+  signals: string[];
+  interests: string[];
+}
+
+export async function decodeHint(input: {
+  text?: string;
+  images?: InlineImage[];
+  occasion?: string;
+}): Promise<DecodedHint> {
+  const hasImage = !!input.images && input.images.length > 0;
+  const prompt = buildDecodeHintPrompt({
+    text: input.text,
+    hasImage,
+    occasion: input.occasion,
+  });
+
+  let raw: string;
+  if (hasImage) {
+    // Images require a multimodal model — only Gemini supports this here.
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error(
+        "Screenshot decoding needs the Gemini provider. Please remove the image or try text only."
+      );
+    }
+    raw = await generateWithGeminiVision(prompt, input.images!);
+  } else {
+    raw = await callAI(prompt);
+  }
+
+  const cleaned = stripJsonFences(raw);
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch {
+    const objMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (!objMatch) {
+      throw new Error("Could not decode the hint. Please try again.");
+    }
+    parsed = JSON.parse(objMatch[0]);
+  }
+
+  const description =
+    typeof parsed.description === "string" ? parsed.description.trim() : "";
+  if (!description) {
+    throw new Error("Could not decode a description from this hint.");
+  }
+
+  const signals = Array.isArray(parsed.signals)
+    ? parsed.signals.filter((s): s is string => typeof s === "string")
+    : [];
+  const interests = Array.isArray(parsed.interests)
+    ? parsed.interests.filter((s): s is string => typeof s === "string")
+    : [];
+
+  return { description, signals, interests };
 }
 
 export async function generateGiftMessage(input: {

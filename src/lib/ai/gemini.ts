@@ -33,3 +33,46 @@ export async function generateWithGemini(prompt: string): Promise<string> {
     clearTimeout(timeout);
   }
 }
+
+export interface InlineImage {
+  mimeType: string;
+  /** Base64-encoded image data (no data: URL prefix). */
+  data: string;
+}
+
+/**
+ * Multimodal Gemini call: a text prompt plus optional inline images.
+ * Used for decoding gift "hints" from a pasted screenshot.
+ */
+export async function generateWithGeminiVision(
+  prompt: string,
+  images: InlineImage[]
+): Promise<string> {
+  const genai = getClient();
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  const parts: Array<
+    { text: string } | { inlineData: { mimeType: string; data: string } }
+  > = [{ text: prompt }];
+  for (const img of images) {
+    parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } });
+  }
+
+  try {
+    const response = await genai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: [{ role: "user", parts }],
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+        abortSignal: controller.signal,
+      },
+    });
+    return response.text ?? "";
+  } finally {
+    clearTimeout(timeout);
+  }
+}

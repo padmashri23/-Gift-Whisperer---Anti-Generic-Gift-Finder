@@ -11,6 +11,7 @@ import BudgetFilter from "@/components/gift-finder/BudgetFilter";
 import GiftResultCard from "@/components/gift-finder/GiftResultCard";
 import GeneratingAnimation from "@/components/gift-finder/GeneratingAnimation";
 import PersonalityQuiz from "@/components/gift-finder/PersonalityQuiz";
+import HintDecoder from "@/components/gift-finder/HintDecoder";
 import FollowUpQuestions from "@/components/gift-finder/FollowUpQuestions";
 import CompareDrawer from "@/components/gift-finder/CompareDrawer";
 import ShareModal from "@/components/gift-finder/ShareModal";
@@ -22,6 +23,8 @@ import {
   Scale,
   Share2,
   User,
+  Wand2,
+  Gift,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -57,6 +60,8 @@ export default function FindPage() {
   const [results, setResults] = useState<GiftIdea[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [blindMode, setBlindMode] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
 
   const [recipientName, setRecipientName] = useState("");
@@ -250,6 +255,20 @@ export default function FindPage() {
     );
   }
 
+  function handleHintComplete(result: {
+    description: string;
+    interests: string[];
+  }) {
+    setDescription(result.description);
+    if (result.interests.length > 0) {
+      setRecipientInterests((prev) =>
+        Array.from(new Set([...prev, ...result.interests]))
+      );
+    }
+    setShowHint(false);
+    toast.success("Hint decoded! Review the description and hit Find.");
+  }
+
   function toggleCompare(id: string) {
     setCompareIds((prev) => {
       const next = new Set(prev);
@@ -320,6 +339,26 @@ export default function FindPage() {
     );
   }
 
+  if (showHint) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">
+            Decode a Hint
+          </h1>
+          <p className="text-text-secondary mt-1">
+            Turn something they said or shared into the perfect gift
+          </p>
+        </div>
+        <HintDecoder
+          occasion={occasion || undefined}
+          onComplete={handleHintComplete}
+          onCancel={() => setShowHint(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -351,15 +390,26 @@ export default function FindPage() {
             >
               Who are you shopping for?
             </label>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowQuiz(true)}
-            >
-              <ClipboardList className="h-4 w-4" />
-              Take Quiz Instead
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHint(true)}
+              >
+                <Wand2 className="h-4 w-4" />
+                Decode a Hint
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowQuiz(true)}
+              >
+                <ClipboardList className="h-4 w-4" />
+                Take Quiz
+              </Button>
+            </div>
           </div>
 
           <Textarea
@@ -399,6 +449,42 @@ export default function FindPage() {
               />
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={() => setBlindMode((v) => !v)}
+            className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors ${
+              blindMode
+                ? "border-accent-300 bg-accent-50 dark:bg-accent-900/20"
+                : "border-border bg-[var(--input-bg)] hover:bg-surface-secondary"
+            }`}
+          >
+            <Gift
+              className={`h-5 w-5 shrink-0 ${
+                blindMode ? "text-accent-600" : "text-text-tertiary"
+              }`}
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-medium text-text-primary">
+                Surprise mode
+              </span>
+              <span className="block text-xs text-text-tertiary">
+                Hide each idea behind a cover — reveal them one at a time
+              </span>
+            </span>
+            <span
+              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                blindMode ? "bg-accent-600" : "bg-surface-tertiary"
+              }`}
+              aria-hidden="true"
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  blindMode ? "translate-x-4" : "translate-x-0.5"
+                }`}
+              />
+            </span>
+          </button>
 
           <Button
             type="submit"
@@ -496,6 +582,7 @@ export default function FindPage() {
                 recipientDescription={description}
                 isComparing={compareIds.has(idea.id)}
                 onToggleCompare={toggleCompare}
+                blindMode={blindMode}
               />
             ))}
           </div>

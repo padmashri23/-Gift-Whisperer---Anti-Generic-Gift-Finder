@@ -14,6 +14,8 @@ import {
   Star,
   AlertTriangle,
   Scale,
+  Gift,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,6 +34,7 @@ interface GiftResultCardProps {
   recipientDescription?: string;
   isComparing?: boolean;
   onToggleCompare?: (id: string) => void;
+  blindMode?: boolean;
 }
 
 export default function GiftResultCard({
@@ -49,10 +52,16 @@ export default function GiftResultCard({
   recipientDescription = "",
   isComparing = false,
   onToggleCompare,
+  blindMode = false,
 }: GiftResultCardProps) {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isGiven, setIsGiven] = useState(initialGiven);
   const [saving, setSaving] = useState(false);
+  const [manualReveal, setManualReveal] = useState(false);
+
+  // Covered only while surprise mode is on and the user hasn't revealed it yet.
+  // Regenerating results remounts the card, which resets manualReveal.
+  const revealed = !blindMode || manualReveal;
 
   async function toggleSave() {
     setSaving(true);
@@ -106,6 +115,29 @@ export default function GiftResultCard({
     { key: "flipkart" as const, label: "Flipkart", color: "hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200" },
     { key: "meesho" as const, label: "Meesho", color: "hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200" },
   ];
+
+  if (blindMode && !revealed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setManualReveal(true)}
+        className="group relative flex min-h-[220px] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-accent-200 bg-gradient-to-br from-primary-500 to-accent-600 p-6 text-center transition-transform hover:scale-[1.02]"
+        title="Reveal this gift idea"
+      >
+        <span className="pointer-events-none absolute inset-0 opacity-20 [background:radial-gradient(circle_at_30%_20%,white,transparent_40%),radial-gradient(circle_at_80%_70%,white,transparent_35%)]" />
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-transform group-hover:rotate-6">
+          <Gift className="h-7 w-7 text-white" />
+        </span>
+        <span className="text-base font-semibold text-white">
+          A gift idea awaits
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+          <Eye className="h-3.5 w-3.5" />
+          Tap to reveal
+        </span>
+      </button>
+    );
+  }
 
   return (
     <Card className={`flex flex-col h-full ${regiftWarning ? "ring-2 ring-warning/50" : ""} ${isComparing ? "ring-2 ring-primary-500" : ""}`}>
