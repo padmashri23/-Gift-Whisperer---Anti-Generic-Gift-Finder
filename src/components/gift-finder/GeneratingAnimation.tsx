@@ -11,7 +11,6 @@ const messages = [
   "Matching vibes to gifts...",
   "Almost there, this one's special...",
 ];
-
 export default function GeneratingAnimation() {
   const [messageIndex, setMessageIndex] = useState(0);
 
