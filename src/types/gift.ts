@@ -27,7 +27,6 @@ export interface GiftSession {
   ai_model: string;
   created_at: string;
 }
-
 export interface OccasionPreset {
   id: string;
   label: string;
