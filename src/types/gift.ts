@@ -15,7 +15,6 @@ export interface GiftIdea {
   rating: number | null;
   created_at: string;
 }
-
 export interface GiftSession {
   id: string;
   user_id: string;
