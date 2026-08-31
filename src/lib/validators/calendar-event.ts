@@ -15,5 +15,4 @@ export const CalendarEventSchema = z.object({
   notes: z.string().max(1000, "Notes are too long").optional().nullable(),
   is_recurring: z.boolean().default(false),
 });
-
 export const CalendarEventUpdateSchema = CalendarEventSchema.partial();
